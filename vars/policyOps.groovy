@@ -58,7 +58,7 @@ def call() {
                         env.USERNAME = "$USERNAME"
                     }
                     def ghPR = sh (
-                        script: "/usr/local/bin/hub pr list --state open | grep Jenkins",
+                        script: "/usr/local/bin/hub pr list --state open | grep Jenkins || true",
                         returnStdout: true
                     ).trim()
                     if ( "${ghPR}" =~ /Jenkins/ ) {
