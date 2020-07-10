@@ -53,6 +53,10 @@ def call() {
                     } else {
                     UPDATED_POLICY_LOCKS = "${POLICY_LOCK.source_options.policy_name}:${POLICY_LOCK.source_options.policy_revision_id}"
                     }
+                    withCredentials([usernamePassword(credentialsId: 'jenkins-bot', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                        env.GITHUB_TOKEN = "$PASSWORD"
+                        env.USERNAME = "$USERNAME"
+                    }
                     def ghPR = sh (
                         script: "/usr/local/bin/hub pr list --state open | grep Jenkins",
                         returnStdout: true
