@@ -54,7 +54,7 @@ def call() {
                     UPDATED_POLICY_LOCKS = "${POLICY_LOCK.source_options.policy_name}:${POLICY_LOCK.source_options.policy_revision_id}"
                     }
                     def ghPR = sh (
-                        script: "/usr/local/bin/gh pr list --state open | grep Jenkins",
+                        script: "/usr/local/bin/hub pr list --state open | grep Jenkins",
                         returnStdout: true
                     ).trim()
                     if ( "${ghPR}" =~ /Jenkins/ ) {
