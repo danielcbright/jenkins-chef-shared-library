@@ -53,7 +53,11 @@ def call() {
                     } else {
                     UPDATED_POLICY_LOCKS = "${POLICY_LOCK.source_options.policy_name}:${POLICY_LOCK.source_options.policy_revision_id}"
                     }
-                    CREATE_PR_BOOL = "true"
+                    if(Jenkins.instance.getItemByFullName("${env.JOB_NAME}").isBuilding()) {
+                        CREATE_PR_BOOL = "false"
+                    } else {
+                        CREATE_PR_BOOL = "true"
+                    }
                 }
                 }
             }
