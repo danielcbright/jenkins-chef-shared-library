@@ -53,9 +53,13 @@ def call() {
                     } else {
                     UPDATED_POLICY_LOCKS = "${POLICY_LOCK.source_options.policy_name}:${POLICY_LOCK.source_options.policy_revision_id}"
                     }
-                    if(Jenkins.instance.getItemByFullName("${env.JOB_NAME}").isBuilding()) {
+                    def ghPR = sh (
+                        script: "/usr/local/bin/gh pr list --open | grep Jenkins",
+                        returnStdout: true
+                    ).trim()
+                    if ( "${ghPR}" =~ /Jenkins/ ) {
                         CREATE_PR_BOOL = "false"
-                        echo "Job already running, exiting..."
+                        echo "PR already created and not closed, exiting..."
                     } else {
                         CREATE_PR_BOOL = "true"
                     }
@@ -74,37 +78,37 @@ def call() {
         }
         steps {
             script {
-            withCredentials([usernamePassword(credentialsId: 'jenkins-bot', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                env.GITHUB_TOKEN = "$PASSWORD"
-                env.USERNAME = "$USERNAME"
+                withCredentials([usernamePassword(credentialsId: 'jenkins-bot', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                    env.GITHUB_TOKEN = "$PASSWORD"
+                    env.USERNAME = "$USERNAME"
+                }
+                delBranches = sh (
+                    script: 'git branch | grep -v "master" || echo "No branches to clean up..."',
+                    returnStdout: true
+                ).trim()
+                dateStamp = sh (
+                    script: 'date "+%Y%m%d%H%M%S%N"',
+                    returnStdout: true
+                ).trim()
+                gitUrl = sh (
+                    script: 'git config remote.origin.url | sed -E "s/^.*\\/\\/(.*)$/\\1/"',
+                    returnStdout: true
+                ).trim()
+                if (delBranches != "No branches to clean up...") {
+                    sh "git branch -D ${delBranches}"
+                }
             }
-            delBranches = sh (
-                script: 'git branch | grep -v "master" || echo "No branches to clean up..."',
-                returnStdout: true
-            ).trim()
-            dateStamp = sh (
-                script: 'date "+%Y%m%d%H%M%S%N"',
-                returnStdout: true
-            ).trim()
-            gitUrl = sh (
-                script: 'git config remote.origin.url | sed -E "s/^.*\\/\\/(.*)$/\\1/"',
-                returnStdout: true
-            ).trim()
-            if (delBranches != "No branches to clean up...") {
-                sh "git branch -D ${delBranches}"
+                sh "git remote rm origin"
+                sh "git config --global user.name \"Jenkins\"; git config --global user.email jenkins@dbright.io"
+                sh "git remote add origin https://$USERNAME:$GITHUB_TOKEN@${gitUrl}"
+                sh "git checkout -b JenkinsAutoUpdate-${dateStamp}"
+                sh 'git status'
+                sh "touch .autoupdate; echo \"${UPDATED_POLICY_LOCKS}\" >> .autoupdate"
+                sh 'git add .autoupdate'
+                sh "git commit -m \"[Jenkins] updating file .autoupdate due to policy include upstream changes detected\""
+                sh "git push --set-upstream origin JenkinsAutoUpdate-${dateStamp}"
+                sh "/usr/local/bin/hub pull-request -m \"[Jenkins] Auto Updater\" -m \"Updating .autoupdate: A Jenkins Automated Build Job ($BUILD_URL) detected changes in upstream policy locks (${UPDATED_POLICY_LOCKS}), this PR is to rebuild this policy and include those new policy locks. \""
             }
-            }
-            sh "git remote rm origin"
-            sh "git config --global user.name \"Jenkins\"; git config --global user.email jenkins@dbright.io"
-            sh "git remote add origin https://$USERNAME:$GITHUB_TOKEN@${gitUrl}"
-            sh "git checkout -b JenkinsAutoUpdate-${dateStamp}"
-            sh 'git status'
-            sh "touch .autoupdate; echo \"${UPDATED_POLICY_LOCKS}\" >> .autoupdate"
-            sh 'git add .autoupdate'
-            sh "git commit -m \"[Jenkins] updating file .autoupdate due to policy include upstream changes detected\""
-            sh "git push --set-upstream origin JenkinsAutoUpdate-${dateStamp}"
-            sh "/usr/local/bin/hub pull-request -m \"[Jenkins] Auto Updater\" -m \"Updating .autoupdate: A Jenkins Automated Build Job ($BUILD_URL) detected changes in upstream policy locks (${UPDATED_POLICY_LOCKS}), this PR is to rebuild this policy and include those new policy locks. \""
-        }
         }
         stage('Tests') {
         when {
@@ -136,12 +140,12 @@ def call() {
                 // Let's use system commands to get values to avoid using @NonCPS (thus making our pipeline serializable)
                 // We'll get the Policy information here to use in further steps
                 POLICY_ID = sh (
-                script: '/opt/chef-workstation/bin/chef export Policyfile.lock.json ./output -a | sed -E "s/^Exported policy \'(.*)\' to.*\\/.*-(.*)\\.tgz$/\\2/"',
-                returnStdout: true
+                    script: '/opt/chef-workstation/bin/chef export Policyfile.lock.json ./output -a | sed -E "s/^Exported policy \'(.*)\' to.*\\/.*-(.*)\\.tgz$/\\2/"',
+                    returnStdout: true
                 ).trim()
                 POLICY_NAME = sh (
-                script: "ls ./output/*$POLICY_ID* | sed -E \"s/.*\\/(.*)-.*\$/\\1/\"",
-                returnStdout: true
+                    script: "ls ./output/*$POLICY_ID* | sed -E \"s/.*\\/(.*)-.*\$/\\1/\"",
+                    returnStdout: true
                 ).trim()
             }
             // Get rid of the Policyfile.lock.json for future runs
