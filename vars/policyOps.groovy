@@ -55,6 +55,7 @@ def call() {
                     }
                     if(Jenkins.instance.getItemByFullName("${env.JOB_NAME}").isBuilding()) {
                         CREATE_PR_BOOL = "false"
+                        echo "Job already running, exiting..."
                     } else {
                         CREATE_PR_BOOL = "true"
                     }
