@@ -69,7 +69,7 @@ def call() {
         }
         steps {
             script {
-            withCredentials([usernamePassword(credentialsId: 'jenkins-pr', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+            withCredentials([usernamePassword(credentialsId: 'jenkins-bot', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
                 env.GITHUB_TOKEN = "$PASSWORD"
                 env.USERNAME = "$USERNAME"
             }
