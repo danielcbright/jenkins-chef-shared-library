@@ -8,10 +8,10 @@ def call() {
 
     pipeline {
     agent any
-    triggers {
-        // Run every 30 minutes, M-F
-        cron('H/30 * * * 1-5')
-    }
+//    triggers {
+//        // Run every 30 minutes, M-F
+//        cron('H/30 * * * 1-5')
+//    }
     environment {
         HOME = "/root/"
     }
