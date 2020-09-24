@@ -26,6 +26,7 @@ def call() {
             branches: [[name: '*/master']],
             userRemoteConfigs: [[
               name: 'origin',
+              credentialsId: 'jenkins-ado',
               refspec: '+refs/heads/*:refs/remotes/origin/*',
               refspec: '+refs/pull/*:refs/remotes/origin-pull/*',
               url: "${params.BUILD_REPOSITORY_URI}"
