@@ -13,7 +13,7 @@ def call() {
 //        cron('H/30 * * * 1-5')
 //    }
     parameters {
-        string(defaultValue: 'NOTDEFINED', name: 'Build.Repository.Uri', description: 'Build.Repository.Uri')
+        string(defaultValue: 'NOTDEFINED', name: 'BUILD_REPOSITORY_URI', description: 'Build.Repository.Uri')
     }
     environment {
         HOME = "/root/"
@@ -21,7 +21,7 @@ def call() {
     stages {
       stage('Test ADO Parameters') {
         steps {
-          echo "Build.Repository.Uri: ${params.Build.Repository.Uri}"
+          echo "Build.Repository.Uri: ${params.BUILD_REPOSITORY_URI}"
         }
       }
         // stage('Tests') {
