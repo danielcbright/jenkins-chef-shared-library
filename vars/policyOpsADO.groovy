@@ -21,8 +21,15 @@ def call() {
     stages {
       stage('Test ADO Parameters') {
         steps {
-          checkout scm:[$class: 'GitSCM', branches: [[name: '*/master']],
-            userRemoteConfigs: [[credentialsId: 'jenkins-ado', url: "${params.BUILD_REPOSITORY_URI}"]]]
+          checkout scm:[
+            $class: 'GitSCM', 
+            branches: [[name: '*/master']],
+            userRemoteConfigs: [[
+              credentialsId: 'jenkins-ado',
+              refspec: '+refs/heads/*:refs/remotes/origin/*'
+              refspec: '+refs/pull/*:refs/remotes/origin-pull/*'
+              url: "${params.BUILD_REPOSITORY_URI}"]
+            ]]
           sh "ls -alt"
           echo "Build.Repository.Uri: ${params.BUILD_REPOSITORY_URI}"
         }
