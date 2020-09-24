@@ -28,7 +28,7 @@ def call() {
               name: 'origin',
               refspec: '+refs/heads/*:refs/remotes/origin/*',
               refspec: '+refs/pull/*:refs/remotes/origin-pull/*',
-              url: '${params.BUILD_REPOSITORY_URI}'
+              url: "${params.BUILD_REPOSITORY_URI}"
             ]]
           ])
           sh "ls -alt"
