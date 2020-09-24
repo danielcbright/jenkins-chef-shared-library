@@ -20,7 +20,7 @@ def call() {
         steps {
             withAWS(credentials: 'aws-policyfile-archive', region: 'us-east-1') {
             wrap([$class: 'ChefIdentityBuildWrapper', jobIdentity: 'jenkins-dbright']) {
-                sh "/opt/chef-workstation/bin/cookstyle ."
+                sh '/opt/chef-workstation/bin/cookstyle .'
                 // sh "/opt/chef-workstation/bin/kitchen test"
                 fileExists 'policy_groups.txt'
                 fileExists 'Policyfile.rb'
@@ -77,7 +77,7 @@ def call() {
             steps {
                 dir("to_upload") {
                 // Azure Storage
-                azureUpload(storageCredentialId: 'fbc18e3a-1207-4a90-9f29-765a8b88ac86', filesPath: "*.*", storageType: 'FILE_STORAGE', containerName: 'policyfile-archive', virtualPath: "$POLICY_NAME/$POLICY_ID/" )   
+                azureUpload(storageCredentialId: 'fbc18e3a-1207-4a90-9f29-765a8b88ac86', filesPath: "*.*", storageType: 'FILE_STORAGE', containerName: 'policyfile-archive', virtualPath: "$POLICY_NAME/$POLICY_ID/" )
                 }
             }
             }
@@ -93,8 +93,8 @@ def call() {
         }
         }
     }
-    post { 
-        always { 
+    post {
+        always {
         cleanWs()
         }
     }
