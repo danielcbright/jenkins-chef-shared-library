@@ -68,8 +68,8 @@ def call() {
             }
             // Get rid of the Policyfile.lock.json for future runs
             sh 'rm Policyfile.lock.json'
-            sh 'mkdir to_upload'
-            sh "cp ./output/*$policyId* ./to_upload/; cp ./policy_groups.txt ./to_upload/"
+            sh "mkdir $toUploadDir"
+            sh "cp ./output/*$policyId* ./$toUploadDir/; cp ./policy_groups.txt ./$toUploadDir/"
             }
             echo "${policyId}"
             echo "${policyName}"
