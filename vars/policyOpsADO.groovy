@@ -21,7 +21,7 @@ def call() {
     stages {
       stage('Test ADO Parameters') {
         steps {
-          echo "Build.Repository.Uri: ${Build.Repository.Uri}"
+          echo "Build.Repository.Uri: ${params.Build.Repository.Uri}"
         }
       }
         // stage('Tests') {
