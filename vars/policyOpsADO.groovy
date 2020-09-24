@@ -43,13 +43,11 @@ def call() {
       }
       stage('Tests') {
         steps {
-          withAWS(credentials: $awsWrapperId, region: $awsWrapperRegion) {
-            wrap([$class: "$chefWrapperId", jobIdentity: "$chefJobId"]) {
-              sh '/opt/chef-workstation/bin/cookstyle .'
-              // sh "/opt/chef-workstation/bin/kitchen test"
-              fileExists 'policy_groups.txt'
-              fileExists 'Policyfile.rb'
-            }
+          wrap([$class: "$chefWrapperId", jobIdentity: "$chefJobId"]) {
+            sh '/opt/chef-workstation/bin/cookstyle .'
+            // sh "/opt/chef-workstation/bin/kitchen test"
+            fileExists 'policy_groups.txt'
+            fileExists 'Policyfile.rb'
           }
         }
       }
