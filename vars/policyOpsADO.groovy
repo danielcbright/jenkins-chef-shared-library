@@ -9,6 +9,7 @@ def call() {
   String awsWrapperRegion = 'us-east-1'
   String s3Bucket = 'dcb-policyfile-archive'
   String azureContainerName = 'policyfile-archive'
+  String azureStorageCredentialsId = 'fbc18e3a-1207-4a90-9f29-765a8b88ac86'
   String gcsCredentialsId = 'gcs-policyfile-archive'
   String gcsBucket = 'gs://policyfile-archive'
   String fileIncludePattern = '*.*'
@@ -52,27 +53,25 @@ def call() {
       stage('Build Policyfile Archive (.tgz)') {
         steps {
             wrap([$class: "$chefWrapperId", jobIdentity: "$chefJobId"]) {
-            sh '/opt/chef-workstation/bin/chef install'
-            script {
-              // Let's use system commands to get values to avoid using @NonCPS (thus making our pipeline serializable)
-              // We'll get the Policy information here to use in further steps
-              policyId = sh (
-                /* groovylint-disable-next-line LineLength */
-                script: '/opt/chef-workstation/bin/chef export Policyfile.lock.json ./output -a | sed -E "s/^Exported policy \'(.*)\' to.*\\/.*-(.*)\\.tgz$/\\2/"',
-                returnStdout: true
-              ).trim()
-              policyName = sh (
-                script: "ls ./output/*$policyId* | sed -E \"s/.*\\/(.*)-.*\$/\\1/\"",
-                returnStdout: true
-              ).trim()
+              sh '/opt/chef-workstation/bin/chef install'
+              script {
+                // Let's use system commands to get values to avoid using @NonCPS (thus making our pipeline
+                //  serializable) We'll get the Policy information here to use in further steps
+                policyId = sh (
+                  /* groovylint-disable-next-line LineLength */
+                  script: '/opt/chef-workstation/bin/chef export Policyfile.lock.json ./output -a | sed -E "s/^Exported policy \'(.*)\' to.*\\/.*-(.*)\\.tgz$/\\2/"',
+                  returnStdout: true
+                ).trim()
+                policyName = sh (
+                  script: "ls ./output/*$policyId* | sed -E \"s/.*\\/(.*)-.*\$/\\1/\"",
+                  returnStdout: true
+                ).trim()
+              }
+              // Get rid of the Policyfile.lock.json for future runs
+              sh 'rm Policyfile.lock.json'
+              sh "mkdir $toUploadDir"
+              sh "cp ./output/*$policyId* ./$toUploadDir/; cp ./policy_groups.txt ./$toUploadDir/"
             }
-            // Get rid of the Policyfile.lock.json for future runs
-            sh 'rm Policyfile.lock.json'
-            sh "mkdir $toUploadDir"
-            sh "cp ./output/*$policyId* ./$toUploadDir/; cp ./policy_groups.txt ./$toUploadDir/"
-            }
-            echo "${policyId}"
-            echo "${policyName}"
         }
       }
       stage('Upload Policyfile Archive to Remote Storage in AWS/GCP/Azure') {
@@ -109,7 +108,7 @@ def call() {
               dir("$toUploadDir") {
                 // Azure Storage
                 azureUpload(
-                  storageCredentialId: 'fbc18e3a-1207-4a90-9f29-765a8b88ac86',
+                  storageCredentialId: "$azureStorageCredentialsId",
                   filesPath: "$fileIncludePattern",
                   storageType: 'FILE_STORAGE',
                   containerName: "$azureContainerName",
@@ -124,8 +123,8 @@ def call() {
         steps {
           build job: 'policyfile-publish-PFP/master', propagate: false, wait: false,
             parameters: [
-                string(name: 'policyName', value: String.valueOf(policyName)),
-                string(name: 'policyId', value: String.valueOf(policyId))
+                string(name: 'policyName', value: "$policyName"),
+                string(name: 'policyId', value: "$policyId")
             ]
         }
       }
