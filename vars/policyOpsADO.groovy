@@ -1,10 +1,10 @@
 def call() {
-    def PUB_POLICY_JSON
-    def FIRST_POLICY_GROUP
-    def POLICY_NAME
-    def POLICY_ID
-    def CREATE_PR_BOOL = "false"
-    def UPDATED_POLICY_LOCKS
+    // def PUB_POLICY_JSON
+    // def FIRST_POLICY_GROUP
+    // def POLICY_NAME
+    // def POLICY_ID
+    // def CREATE_PR_BOOL = "false"
+    // def UPDATED_POLICY_LOCKS
 
     pipeline {
     agent any
@@ -22,7 +22,6 @@ def call() {
       stage('Test ADO Parameters') {
         steps {
           echo "Build.Repository.Uri: ${Build.Repository.Uri}"
-
         }
       }
         // stage('Tests') {
@@ -103,9 +102,9 @@ def call() {
         // }
     }
     post { 
-        always { 
+      always { 
         cleanWs()
-        }
+      }
     }
-    }
+  }
 }
