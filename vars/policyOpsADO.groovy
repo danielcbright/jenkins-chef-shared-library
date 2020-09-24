@@ -8,11 +8,9 @@ def call() {
   String awsWrapperId = 'aws-policyfile-archive'
   String awsWrapperRegion = 'us-east-1'
   String s3Bucket = 'dcb-policyfile-archive'
-  String s3Path = "$policyName/$policyId/"
   String azureContainerName = 'policyfile-archive'
-  String azureVirtualPath = "$policyName/$policyId/"
   String gcsCredentialsId = 'gcs-policyfile-archive'
-  String gcsBucket = "gs://policyfile-archive/$policyName/$policyId/"
+  String gcsBucket = 'gs://policyfile-archive'
   String fileIncludePattern = '*.*'
   String toUploadDir = 'toUpload'
 
@@ -85,7 +83,7 @@ def call() {
                 // GCS
                 googleStorageUpload(
                   credentialsId: "$gcsCredentialsId",
-                  bucket: "$gcsBucket",
+                  bucket: "$gcsBucket/$policyName/$policyId/",
                   pattern: "$fileIncludePattern"
                 )
               }
@@ -98,7 +96,7 @@ def call() {
                 withAWS(credentials: "$awsWrapperId", region: "$awsWrapperRegion") {
                   s3Upload(
                     bucket: "$s3Bucket",
-                    path: "$s3Path",
+                    path: "$policyName/$policyId/",
                     /* groovylint-disable-next-line DuplicateStringLiteral */
                     includePathPattern: "$fileIncludePattern"
                   )
@@ -115,7 +113,7 @@ def call() {
                   filesPath: "$fileIncludePattern",
                   storageType: 'FILE_STORAGE',
                   containerName: "$azureContainerName",
-                  virtualPath: "$azureVirtualPath"
+                  virtualPath: "$policyName/$policyId/"
                 )
               }
             }
