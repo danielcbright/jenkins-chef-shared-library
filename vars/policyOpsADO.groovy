@@ -21,6 +21,9 @@ def call() {
     stages {
       stage('Test ADO Parameters') {
         steps {
+          checkout scm:[$class: 'GitSCM', branches: [[name: '*/master']],
+            userRemoteConfigs: [[credentialsId: 'jenkins-ado', url: "${params.BUILD_REPOSITORY_URI}"]]]
+          sh "ls -alt"
           echo "Build.Repository.Uri: ${params.BUILD_REPOSITORY_URI}"
         }
       }
