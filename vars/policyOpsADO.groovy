@@ -17,10 +17,6 @@ def call() {
 
   pipeline {
     agent any
-    node {
-      currentBuild.displayName = "fooName"
-      currentBuild.description = "fooDescription"
-    }
     parameters {
         string(defaultValue: 'NOTDEFINED', name: 'BUILD_REPOSITORY_URI', description: 'Build.Repository.Uri')
     }
@@ -30,6 +26,9 @@ def call() {
     stages {
       stage('Get Files from ADO') {
         steps {
+          script {
+            currentBuild.displayName = params.BUILD_REPOSITORY_URI
+          }
           checkout([
             $class: 'GitSCM',
             branches: [[name: '*/master']],
