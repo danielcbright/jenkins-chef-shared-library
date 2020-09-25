@@ -27,7 +27,7 @@ def call() {
       stage('Get Files from ADO') {
         steps {
           script {
-            currentBuild.displayName = params.BUILD_REPOSITORY_URI
+            currentBuild.displayName = "${BUILD_NUMBER} - ${params.BUILD_REPOSITORY_URI}"
           }
           checkout([
             $class: 'GitSCM',
