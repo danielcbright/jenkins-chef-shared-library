@@ -119,18 +119,15 @@ def call() {
           }
         }
       }
-      stage('Kick off Publish Job') {
+      stage('Create CD Artifact') {
         steps {
-          build job: 'policyfile-publish-PFP/master', propagate: false, wait: false,
-            parameters: [
-                string(name: 'policyName', value: "$policyName"),
-                string(name: 'policyId', value: "$policyId")
-            ]
+          sh "echo \"$policyName:$policyId\" > policyInfo.txt"
         }
       }
     }
     post {
       always {
+        archiveArtifacts artifacts: 'policyInfo.txt', onlyIfSuccessful: true
         cleanWs()
       }
     }
