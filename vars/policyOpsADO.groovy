@@ -17,6 +17,10 @@ def call() {
 
   pipeline {
     agent any
+    node {
+      currentBuild.displayName = "fooName"
+      currentBuild.description = "fooDescription"
+    }
     parameters {
         string(defaultValue: 'NOTDEFINED', name: 'BUILD_REPOSITORY_URI', description: 'Build.Repository.Uri')
     }
