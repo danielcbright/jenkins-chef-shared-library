@@ -24,6 +24,9 @@ def call() {
     }
     stages {
       stage('Tests') {
+        when {
+          branch 'PR-*'
+        }
         steps {
           wrap([$class: "$chefWrapperId", jobIdentity: "$chefJobId"]) {
             sh '/opt/chef-workstation/bin/cookstyle .'
@@ -46,6 +49,9 @@ def call() {
         }
       }
       stage('Build Policyfile Archive (.tgz)') {
+        when {
+          branch 'PR-*'
+        }
         steps {
           wrap([$class: "$chefWrapperId", jobIdentity: "$chefJobId"]) {
             sh '/opt/chef-workstation/bin/chef install'
@@ -70,6 +76,9 @@ def call() {
         }
       }
       stage('Upload Policyfile Archive to Remote Storage in AWS/GCP/Azure') {
+        when {
+          branch 'PR-*'
+        }
         parallel {
           stage('Upload to GCS') {
             steps {
@@ -84,6 +93,9 @@ def call() {
             }
           }
           stage('Upload to S3') {
+            when {
+              branch 'PR-*'
+            }
             steps {
               dir("$toUploadDir") {
                 // S3
@@ -99,6 +111,9 @@ def call() {
             }
           }
           stage('Upload to Azure') {
+            when {
+              branch 'PR-*'
+            }
             steps {
               dir("$toUploadDir") {
                 // Azure Storage
@@ -115,6 +130,9 @@ def call() {
         }
       }
       stage('Kick off Publish Job') {
+        when {
+          branch 'PR-*'
+        }
         steps {
           build job: 'policyfile-publish-PFP/master', propagate: false, wait: false,
           parameters: [
@@ -124,6 +142,9 @@ def call() {
         }
       }
       stage('Create CD Artifact') {
+        when {
+          branch 'PR-*'
+        }
         steps {
           sh "echo \"$policyName:$policyId\" > policyInfo.txt"
         }
