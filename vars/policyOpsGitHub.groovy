@@ -147,12 +147,12 @@ def call() {
         }
         steps {
           sh "echo \"$policyName:$policyId\" > policyInfo.txt"
+          archiveArtifacts artifacts: 'policyInfo.txt', onlyIfSuccessful: true
         }
       }
     }
     post {
       always {
-        archiveArtifacts artifacts: 'policyInfo.txt', onlyIfSuccessful: true
         cleanWs()
       }
     }
