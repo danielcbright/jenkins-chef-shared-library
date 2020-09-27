@@ -123,6 +123,11 @@ def call() {
           ]
         }
       }
+      stage('Create CD Artifact') {
+        steps {
+          sh "echo \"$policyName:$policyId\" > policyInfo.txt"
+        }
+      }
     }
     post {
       always {
