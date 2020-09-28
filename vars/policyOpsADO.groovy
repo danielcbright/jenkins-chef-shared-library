@@ -53,20 +53,20 @@ def call() {
             sh '/opt/chef-workstation/bin/cookstyle .'
             // sh "/opt/chef-workstation/bin/kitchen test"
           }
-          script {
-            if ("$policyGroupsTxt" == 'true') {
-              echo 'policy_groups.txt exists...'
-            } else {
-              currentBuild.rawBuild.result = Result.ABORTED
-              throw new hudson.AbortException('policy_groups.txt doesn\'t exist, aborting job...')
-            }
-            if ("$policyfileRb" == 'true') {
-              echo 'Policyfile.rb exists...'
-            } else {
-              currentBuild.rawBuild.result = Result.ABORTED
-              throw new hudson.AbortException('Policyfile.rb doesn\'t exist, aborting job...')
-            }
-          }
+          // script {
+          //   if ("$policyGroupsTxt" == 'true') {
+          //     echo 'policy_groups.txt exists...'
+          //   } else {
+          //     currentBuild.rawBuild.result = Result.ABORTED
+          //     throw new hudson.AbortException('policy_groups.txt doesn\'t exist, aborting job...')
+          //   }
+          //   if ("$policyfileRb" == 'true') {
+          //     echo 'Policyfile.rb exists...'
+          //   } else {
+          //     currentBuild.rawBuild.result = Result.ABORTED
+          //     throw new hudson.AbortException('Policyfile.rb doesn\'t exist, aborting job...')
+          //   }
+          // }
         }
       }
       stage('Build Policyfile Archive (.tgz)') {
