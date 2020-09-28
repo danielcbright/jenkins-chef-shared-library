@@ -22,6 +22,8 @@ def call() {
     }
     environment {
         HOME = '/root/'
+        POLICY_GROUPS_TXT = false
+        POLICYFILE_RB = false
     }
     stages {
       stage('Get Files from ADO') {
