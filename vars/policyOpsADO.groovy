@@ -22,16 +22,14 @@ def call() {
     }
     environment {
         HOME = '/root/'
-        POLICY_GROUPS_TXT = false
-        POLICYFILE_RB = false
     }
     stages {
       stage('Get Files from ADO') {
         steps {
           script {
             currentBuild.displayName = "${BUILD_NUMBER} - ${params.BUILD_REPOSITORY_URI}"
-            env.POLICY_GROUPS_TXT = fileExists 'policy_groups.txt'
-            env.POLICYFILE_RB = fileExists 'Policyfile.rb'
+            policyGroupsTxt = fileExists 'policy_groups.txt'
+            policyfileRb = fileExists 'Policyfile.rb'
           }
           checkout([
             $class: 'GitSCM',
@@ -54,13 +52,13 @@ def call() {
             // sh "/opt/chef-workstation/bin/kitchen test"
           }
           script {
-            if (env.POLICY_GROUPS_TXT == 'true') {
+            if ("$policyGroupsTxt" == 'true') {
               echo 'policy_groups.txt exists...'
             } else {
               currentBuild.rawBuild.result = Result.ABORTED
               throw new hudson.AbortException('policy_groups.txt doesn\'t exist, aborting job...')
             }
-            if (env.POLICYFILE_RB == 'true') {
+            if ("$policyfileRb" == 'true') {
               echo 'Policyfile.rb exists...'
             } else {
               currentBuild.rawBuild.result = Result.ABORTED
