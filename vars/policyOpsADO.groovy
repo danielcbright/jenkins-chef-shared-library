@@ -139,9 +139,6 @@ def call() {
         }
       }
       stage('Publish to Test Policy Group') {
-        when {
-          branch 'PR-*'
-        }
         steps {
           wrap([$class: "$chefWrapperId", jobIdentity: "$chefJobId"]) {
             sh "/opt/chef-workstation/bin/chef push-archive ci-test-upload ./output/$policyName-$params.policyId.tgz"
@@ -149,9 +146,6 @@ def call() {
         }
       }
       stage('Kick off Publish Job') {
-        when {
-          branch 'PR-*'
-        }
         steps {
           build job: 'policyfile-publish-PFP/master', propagate: false, wait: false,
           parameters: [
