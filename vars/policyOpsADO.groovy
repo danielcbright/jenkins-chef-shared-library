@@ -45,9 +45,6 @@ def call() {
           echo "Build.Repository.Uri: ${params.BUILD_REPOSITORY_URI}"
         }
       }
-      environment {
-        
-      }
       stage('Tests') {
         steps {
           wrap([$class: "$chefWrapperId", jobIdentity: "$chefJobId"]) {
