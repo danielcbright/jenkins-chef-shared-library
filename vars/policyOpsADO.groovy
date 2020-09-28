@@ -28,6 +28,8 @@ def call() {
         steps {
           script {
             currentBuild.displayName = "${BUILD_NUMBER} - ${params.BUILD_REPOSITORY_URI}"
+            env.POLICY_GROUPS_TXT = fileExists 'policy_groups.txt'
+            env.POLICYFILE_RB = fileExists 'Policyfile.rb'
           }
           checkout([
             $class: 'GitSCM',
@@ -41,8 +43,6 @@ def call() {
           ])
           sh 'ls -alt'
           echo "Build.Repository.Uri: ${params.BUILD_REPOSITORY_URI}"
-          env.POLICY_GROUPS_TXT = fileExists 'policy_groups.txt'
-          env.POLICYFILE_RB = fileExists 'Policyfile.rb'
         }
       }
       environment {
