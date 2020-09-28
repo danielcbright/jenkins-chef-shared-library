@@ -22,8 +22,6 @@ def call() {
     }
     environment {
         HOME = '/root/'
-        POLICY_GROUPS_TXT = fileExists 'policy_groups.txt'
-        POLICYFILE_RB = fileExists 'Policyfile.rb'
     }
     stages {
       stage('Get Files from ADO') {
@@ -43,7 +41,12 @@ def call() {
           ])
           sh 'ls -alt'
           echo "Build.Repository.Uri: ${params.BUILD_REPOSITORY_URI}"
+          env.POLICY_GROUPS_TXT = fileExists 'policy_groups.txt'
+          env.POLICYFILE_RB = fileExists 'Policyfile.rb'
         }
+      }
+      environment {
+        
       }
       stage('Tests') {
         steps {
