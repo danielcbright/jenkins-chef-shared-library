@@ -138,6 +138,28 @@ def call() {
           }
         }
       }
+      stage('Publish to Test Policy Group') {
+        when {
+          branch 'PR-*'
+        }
+        steps {
+          wrap([$class: "$chefWrapperId", jobIdentity: "$chefJobId"]) {
+            sh "/opt/chef-workstation/bin/chef push-archive ci-test-upload ./output/$policyName-$params.policyId.tgz"
+          }
+        }
+      }
+      stage('Kick off Publish Job') {
+        when {
+          branch 'PR-*'
+        }
+        steps {
+          build job: 'policyfile-publish-PFP/master', propagate: false, wait: false,
+          parameters: [
+            string(name: 'policyName', value: "$policyName"),
+            string(name: 'policyId', value: "$policyId")
+          ]
+        }
+      }
       stage('Create CD Artifact') {
         steps {
           sh "echo \"$policyName:$policyId\" > policyInfo.txt"
