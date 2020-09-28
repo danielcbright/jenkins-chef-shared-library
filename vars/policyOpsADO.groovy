@@ -14,6 +14,8 @@ def call() {
   String gcsBucket = 'gs://policyfile-archive'
   String fileIncludePattern = '*.*'
   String toUploadDir = 'toUpload'
+  String policyGroupsTxt = 'false'
+  String policyfileRb = 'false'
 
   pipeline {
     agent any
