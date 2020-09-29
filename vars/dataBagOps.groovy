@@ -28,15 +28,27 @@ def call() {
                     filename="${f%/}"
                     filename="${filename##*/}"
                     filename=$(echo "$filename" | cut -f 1 -d '.')
-                    ver_on_server=`knife data bag show $dirname $filename -F json | jq -r '.version'`
-                    ver_on_disk=`jq -r '.version' $f`
-                    mkdir -p attribute_data_bags_archive/$dirname
-                    if [ "$ver_on_disk" -gt "$ver_on_server" ]; then
-                      knife data bag show $dirname $filename -F json > attribute_data_bags_archive/$dirname/$filename-$ver_on_server.json
-                      knife data bag from file $dirname $f
-                      echo "$dirname:$f:$ver_on_disk:$ver_on_server:updated" >> output.txt
+                    knife data bag show $dirname $filename > output 2>&1
+                    if grep -q "The object you are looking for could not be found"; then
+                      ver_on_server=0
+                      ver_on_disk=`jq -r '.version' $f`
+                      if [ "$ver_on_disk" == "null" ]; then
+                        echo "$dirname:$f:$ver_on_disk:not_on_server:not_created_needs_version" >> output.txt
+                      else
+                        knife data bag from file $dirname $f
+                        echo "$dirname:$f:$ver_on_disk:$ver_on_server:created" >> output.txt
+                      fi
                     else
-                      echo "$dirname:$f:$ver_on_disk:$ver_on_server:skipped" >> output.txt
+                      ver_on_server=`knife data bag show $dirname $filename -F json | jq -r '.version'`
+                      ver_on_disk=`jq -r '.version' $f`
+                      mkdir -p attribute_data_bags_archive/$dirname
+                      if [ "$ver_on_disk" -gt "$ver_on_server" ]; then
+                        knife data bag show $dirname $filename -F json > attribute_data_bags_archive/$dirname/$filename-$ver_on_server.json
+                        knife data bag from file $dirname $f
+                        echo "$dirname:$f:$ver_on_disk:$ver_on_server:updated" >> output.txt
+                      else
+                        echo "$dirname:$f:$ver_on_disk:$ver_on_server:skipped" >> output.txt
+                      fi
                     fi
                   done
                 done
@@ -55,7 +67,7 @@ def call() {
                 bagVerNew = "${vars[2]}"
                 bagVerOld = "${vars[3]}"
                 bagStatus = "${vars[4]}"
-                echo "Data Bag: $bagName, Item: $bagItem, New Version: $bagVerNew, Old Version: $bagVerOld, Updated?: $bagStatus"
+                echo "Data Bag: $bagName, Item: $bagItem, New Version (On Server): $bagVerNew, Old Version: $bagVerOld, Updated?: $bagStatus"
               }
             }
           }
