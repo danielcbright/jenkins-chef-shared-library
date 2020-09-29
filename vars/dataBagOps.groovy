@@ -32,7 +32,7 @@ def call() {
                     if grep -q "The object you are looking for could not be found" output; then
                       ver_on_disk=`jq -r '.version' $f`
                       if [ "$ver_on_disk" == "null" ]; then
-                        echo "$dirname:$f:$ver_on_disk:not_on_server:not_created_needs_version" >> output.txt
+                        echo "$dirname:$f:not_on_server:not_set:not_created_needs_version" >> output.txt
                       else
                         knife data bag from file $dirname $f
                         echo "$dirname:$f:$ver_on_disk:$ver_on_disk:created" >> output.txt
