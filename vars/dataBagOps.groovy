@@ -29,7 +29,7 @@ def call() {
                     filename="${filename##*/}"
                     filename=$(echo "$filename" | cut -f 1 -d '.')
                     knife data bag show $dirname $filename > output 2>&1 || :
-                    if grep -q "The object you are looking for could not be found"; then
+                    if grep -q "The object you are looking for could not be found" output; then
                       ver_on_disk=`jq -r '.version' $f`
                       if [ -z "$ver_on_disk" ]; then
                         echo "$dirname:$f:$ver_on_disk:not_on_server:not_created_needs_version" >> output.txt
