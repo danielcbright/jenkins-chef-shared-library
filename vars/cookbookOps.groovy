@@ -1,7 +1,6 @@
 /* groovylint-disable NestedBlockDepth */
 def call() {
   String gitHubCredId = 'github_pr'
-  String chefWrapperId = 'ChefIdentityBuildWrapper'
 
   pipeline {
     agent any
@@ -39,9 +38,7 @@ def call() {
           branch 'PR-*'
         }
         steps {
-          wrap([$class: "$chefWrapperId", jobIdentity: "$chefJobId"]) {
-            sh '/opt/chef-workstation/bin/kitchen test'
-          }
+          sh '/opt/chef-workstation/bin/kitchen test'
         }
       }
     }
