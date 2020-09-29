@@ -6,7 +6,7 @@ def call() {
   pipeline {
     agent any
     environment {
-      PATH = "/opt/rh/rh-ruby22/root/usr/bin:$PATH"
+      HOME = '/root/'
     }
     stages {
       stage('Cookbook Version Validation') {
