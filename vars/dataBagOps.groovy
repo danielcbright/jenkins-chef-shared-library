@@ -1,6 +1,9 @@
 /* groovylint-disable GStringExpressionWithinString, LineLength, NestedBlockDepth */
 /* groovylint-disable-next-line MethodReturnTypeRequired, MethodSize, NoDef */
 def call() {
+  String chefWrapperId = 'ChefIdentityBuildWrapper'
+  String chefJobId = 'jenkins-dbright'
+  
   pipeline {
     agent any
     environment {
