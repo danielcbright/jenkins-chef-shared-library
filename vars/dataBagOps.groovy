@@ -28,7 +28,7 @@ def call() {
                     filename="${f%/}"
                     filename="${filename##*/}"
                     filename=$(echo "$filename" | cut -f 1 -d '.')
-                    knife data bag show $dirname $filename > output 2>&1
+                    knife data bag show $dirname $filename > output 2>&1 || :
                     if grep -q "The object you are looking for could not be found"; then
                       ver_on_server=0
                       ver_on_disk=`jq -r '.version' $f`
