@@ -30,13 +30,12 @@ def call() {
                     filename=$(echo "$filename" | cut -f 1 -d '.')
                     knife data bag show $dirname $filename > output 2>&1 || :
                     if grep -q "The object you are looking for could not be found"; then
-                      ver_on_server=0
                       ver_on_disk=`jq -r '.version' $f`
-                      if [ "$ver_on_disk" == "null" ]; then
+                      if [ -z "$ver_on_disk" ]; then
                         echo "$dirname:$f:$ver_on_disk:not_on_server:not_created_needs_version" >> output.txt
                       else
                         knife data bag from file $dirname $f
-                        echo "$dirname:$f:$ver_on_disk:$ver_on_server:created" >> output.txt
+                        echo "$dirname:$f:$ver_on_disk:$ver_on_disk:created" >> output.txt
                       fi
                     else
                       ver_on_server=`knife data bag show $dirname $filename -F json | jq -r '.version'`
