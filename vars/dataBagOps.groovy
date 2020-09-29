@@ -3,7 +3,7 @@
 def call() {
   String chefWrapperId = 'ChefIdentityBuildWrapper'
   String chefJobId = 'jenkins-dbright'
-  
+
   pipeline {
     agent any
     environment {
@@ -19,30 +19,44 @@ def call() {
             script {
               sh (
                 script: '''
+                touch output.txt
                 for d in attribute_data_bags/*/ ; do
                   dirname="${d%/}"
                   dirname="${dirname##*/}"
                   knife data bag create ${dirname%/}
                   for f in $d* ; do
-                    ver_on_server=`knife data bag show $dirname attributes -F json | jq -r '.version'`
-                    ver_on_disk=`jq -r '.version' $f`
                     filename="${f%/}"
                     filename="${filename##*/}"
                     filename=$(echo "$filename" | cut -f 1 -d '.')
+                    ver_on_server=`knife data bag show $dirname $filename -F json | jq -r '.version'`
+                    ver_on_disk=`jq -r '.version' $f`
                     mkdir -p attribute_data_bags_archive/$dirname
-                    echo "Version of [$dirname $f] on disk is :[$ver_on_disk], server: [$ver_on_server]"
                     if [ "$ver_on_disk" -gt "$ver_on_server" ]; then
-                      knife data bag show global attributes -F json > attribute_data_bags_archive/$dirname/$filename-$ver_on_server.json
-                      ln -f -s $filename-$ver_on_server.json attribute_data_bags_archive/$dirname/$filename-last.json
+                      knife data bag show $dirname $filename -F json > attribute_data_bags_archive/$dirname/$filename-$ver_on_server.json
                       knife data bag from file $dirname $f
+                      echo "$dirname:$f:$ver_on_disk:$ver_on_server:updated" >> output.txt
                     else
-                      echo "Skipping data bag upload for $f since it's version on disk is not greater than the version on the server...\\n"
+                      echo "$dirname:$f:$ver_on_disk:$ver_on_server:skipped" >> output.txt
                     fi
                   done
                 done
                 ''',
                 returnStdout: true
-              )
+              ).trim()
+              dbagStatusTxt = sh (
+                script: '/usr/bin/cat output.txt',
+                returnStdout: true
+              ).trim()
+              dbags = dbagStatusTxt.split('\n')
+              for (bag in dbags) {
+                vars = bag.split(':')
+                bagName = "${vars[0]}"
+                bagItem = "${vars[1]}"
+                bagVerNew = "${vars[2]}"
+                bagVerOld = "${vars[3]}"
+                bagStatus = "${vars[4]}"
+                echo "Data Bag: $bagName, Item: $bagItem, New Version: $bagVerNew, Old Version: $bagVerOld, Updated?: $bagStatus"
+              }
             }
           }
         }
