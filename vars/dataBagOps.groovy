@@ -66,7 +66,7 @@ def call() {
           branch 'PR-*'
         }
         steps {
-          archiveArtifacts artifacts: 'attribute_data_bags_archive/**/*', onlyIfSuccessful: true
+          archiveArtifacts artifacts: 'attribute_data_bags_archive/**/*', onlyIfSuccessful: true, allowEmptyArchive: true
         }
       }
     }
