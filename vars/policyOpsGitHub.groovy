@@ -135,7 +135,7 @@ def call() {
         }
         steps {
           wrap([$class: "$chefWrapperId", jobIdentity: "$chefJobId"]) {
-            sh "/opt/chef-workstation/bin/chef push-archive ci-test-upload ./output/$policyName-${params.policyId}.tgz"
+            sh "/opt/chef-workstation/bin/chef push-archive ci-test-upload ./output/$policyName-${policyId}.tgz"
           }
         }
       }
