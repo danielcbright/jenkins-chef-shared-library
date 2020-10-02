@@ -20,7 +20,7 @@ def call() {
               sh (
                 script: '''
                 touch output.txt
-                for d in attribute_data_bags/*/ ; do
+                for d in data_bags/*/ ; do
                   dirname="${d%/}"
                   dirname="${dirname##*/}"
                   knife data bag create ${dirname%/}
@@ -40,9 +40,9 @@ def call() {
                     else
                       ver_on_server=`knife data bag show $dirname $filename -F json | jq -r '.version'`
                       ver_on_disk=`jq -r '.version' $f`
-                      mkdir -p attribute_data_bags_archive/$dirname
+                      mkdir -p data_bags_archive/$dirname
                       if [ "$ver_on_disk" -gt "$ver_on_server" ]; then
-                        knife data bag show $dirname $filename -F json > attribute_data_bags_archive/$dirname/$filename-$ver_on_server.json
+                        knife data bag show $dirname $filename -F json > data_bags_archive/$dirname/$filename-$ver_on_server.json
                         knife data bag from file $dirname $f
                         echo "$dirname:$f:$ver_on_disk:$ver_on_server:updated" >> output.txt
                       else
@@ -77,7 +77,7 @@ def call() {
           branch 'PR-*'
         }
         steps {
-          archiveArtifacts artifacts: 'attribute_data_bags_archive/**/*', onlyIfSuccessful: true, allowEmptyArchive: true
+          archiveArtifacts artifacts: 'data_bags_archive/**/*', onlyIfSuccessful: true, allowEmptyArchive: true
         }
       }
     }
