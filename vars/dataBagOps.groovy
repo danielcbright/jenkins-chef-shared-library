@@ -38,8 +38,8 @@ def call() {
                         echo "$dirname:$f:$ver_on_disk:$ver_on_disk:created" >> output.txt
                       fi
                     else
-                      ver_on_server=`knife data bag show $dirname $filename -F json | jq 'keys' attributes.json | grep -- version- | cut -f 2 -d '-' | cut -f 1 -d '"'`
-                      ver_on_disk=`jq 'keys' attributes.json | grep -- version- | cut -f 2 -d '-' | cut -f 1 -d '"' $f`
+                      ver_on_server=`knife data bag show $dirname $filename -F json | jq 'keys' | grep -- version- | cut -f 2 -d '-' | cut -f 1 -d '"'`
+                      ver_on_disk=`jq 'keys' $f | grep -- version- | cut -f 2 -d '-' | cut -f 1 -d '"' $f`
                       mkdir -p data_bags_archive/$dirname
                       if [ "$ver_on_disk" -gt "$ver_on_server" ]; then
                         knife data bag show $dirname $filename -F json > data_bags_archive/$dirname/$filename-$ver_on_server.json
